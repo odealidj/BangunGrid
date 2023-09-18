@@ -1,0 +1,35 @@
+# Internal documentation
+docs/
+
+# Binaries for programs and plugins
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test and coverage artifacts
+*.out
+coverage.html
+profile.out
+
+# Dependency directories
+vendor/
+
+# Environment and local configs
+.env
+.env.*
+!.env.example
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System Files
+.DS_Store
+Thumbs.db

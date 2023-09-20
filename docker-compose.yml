@@ -1,0 +1,131 @@
+services:
+  # ==========================================
+  # 1. PostgreSQL 16 dengan Ekstensi PostGIS
+  # ==========================================
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: bangungrid-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bangungrid}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bangungrid_secret_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-bangungrid_main}
+    ports:
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bangungrid} -d ${POSTGRES_DB:-bangungrid_main}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bangungrid-network
+
+  # ==========================================
+  # 2. Redis 7 (Distributed Lock & Caching)
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: bangungrid-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_secret_pass}
+    ports:
+      - "${REDIS_PORT:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_secret_pass}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bangungrid-network
+
+  # ==========================================
+  # 3. NATS 2.10 dengan JetStream Aktif (-js)
+  # ==========================================
+  nats:
+    image: nats:alpine
+    container_name: bangungrid-nats
+    restart: unless-stopped
+    command: ["-js", "-m", "8222"]
+    ports:
+      - "4222:4222" # Client port
+      - "8222:8222" # HTTP Management & Healthcheck port
+    volumes:
+      - nats_data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bangungrid-network
+
+  # ==========================================
+  # 4. MinIO S3 (Penyimpanan Foto e-POD & Dokumen)
+  # ==========================================
+  minio:
+    profiles:
+      - storage
+    image: minio/minio:latest
+    container_name: bangungrid-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-bangungrid_minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio_secret_pass}
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web Console
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # ==========================================
+  # 5. BangunGrid Auth Service (Go Microservice)
+  # ==========================================
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: bangungrid-auth-service
+    restart: unless-stopped
+    environment:
+      PORT: "8081"
+      DATABASE_URL: "postgres://${POSTGRES_USER:-bangungrid}:${POSTGRES_PASSWORD:-bangungrid_secret_pass}@postgres:5432/db_auth?sslmode=disable"
+      REDIS_HOST: "redis:6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-redis_secret_pass}"
+      NATS_URL: "nats://nats:4222"
+      APP_ENV: "development"
+    ports:
+      - "${AUTH_PORT:-8085}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    networks:
+      - bangungrid-network
+
+networks:
+  bangungrid-network:
+    name: bangungrid-network
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: bangungrid_postgres_data
+  redis_data:
+    name: bangungrid_redis_data
+  nats_data:
+    name: bangungrid_nats_data
+  minio_data:
+    name: bangungrid_minio_data

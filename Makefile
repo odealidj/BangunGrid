@@ -64,7 +64,11 @@ test-race:
 	@echo "==> [4/4] Menjalankan Unit Tests dengan Data Race Detector..."
 	@go test -race -v -coverprofile=coverage.out ./...
 
-verify-all: lint sec vuln test-race
+test-integration:
+	@echo "==> Menjalankan Automated Integration Tests (E2E API & Backing Services)..."
+	@cd services/auth-service && go test -tags=integration -race -v ./test/integration/...
+
+verify-all: lint sec vuln test-race test-integration
 	@echo ""
 	@echo "=========================================================="
 	@echo "  SELURUH PENGECEKAN KUALITAS & KEAMANAN BERHASIL (LULUS)!"

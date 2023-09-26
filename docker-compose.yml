@@ -115,6 +115,34 @@ services:
     networks:
       - bangungrid-network
 
+  # ==========================================
+  # 6. BangunGrid Catalog Service (Go Microservice)
+  # ==========================================
+  catalog-service:
+    build:
+      context: .
+      dockerfile: services/catalog-service/Dockerfile
+    container_name: bangungrid-catalog-service
+    restart: unless-stopped
+    environment:
+      PORT: "8082"
+      DATABASE_URL: "postgres://${POSTGRES_USER:-bangungrid}:${POSTGRES_PASSWORD:-bangungrid_secret_pass}@postgres:5432/db_catalog?sslmode=disable"
+      REDIS_HOST: "redis:6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-redis_secret_pass}"
+      NATS_URL: "nats://nats:4222"
+      APP_ENV: "development"
+    ports:
+      - "${CATALOG_PORT:-8086}:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    networks:
+      - bangungrid-network
+
 networks:
   bangungrid-network:
     name: bangungrid-network

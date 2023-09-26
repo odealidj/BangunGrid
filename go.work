@@ -3,4 +3,5 @@ go 1.23.0
 use (
 	./pkg
 	./services/auth-service
+	./services/catalog-service
 )

@@ -13,8 +13,8 @@ WORKDIR /workspace
 # Salin modul pkg dan auth-service
 COPY pkg/ ./pkg/
 COPY services/auth-service/ ./services/auth-service/
-COPY go.work* ./
 
+ENV GOWORK=off
 WORKDIR /workspace/services/auth-service
 
 # Unduh dependensi dan kompilasi binary statis

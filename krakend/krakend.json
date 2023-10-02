@@ -1,0 +1,432 @@
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "version": 3,
+  "name": "BangunGrid Enterprise API Gateway",
+  "port": 8080,
+  "cache_ttl": "300s",
+  "timeout": "10000ms",
+  "extra_config": {
+    "telemetry/logging": {
+      "level": "INFO",
+      "prefix": "[KRAKEND]",
+      "syslog": false,
+      "stdout": true
+    },
+    "security/cors": {
+      "allow_origins": ["*"],
+      "allow_methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      "allow_headers": [
+        "Origin",
+        "Authorization",
+        "Content-Type",
+        "Accept",
+        "X-Requested-With",
+        "X-Tenant-ID",
+        "X-Branch-ID",
+        "X-Idempotency-Key",
+        "X-Request-ID"
+      ],
+      "expose_headers": ["Content-Length"],
+      "allow_credentials": true,
+      "max_age": "12h"
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/healthz",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/healthz",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://auth-service:8081"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/.well-known/jwks.json",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/.well-known/jwks.json",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://auth-service:8081"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/auth/register",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/auth/register",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://auth-service:8081"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/auth/login",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "qos/ratelimit/router": {
+          "max_rate": 50,
+          "client_max_rate": 20,
+          "strategy": "ip"
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/auth/login",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://auth-service:8081"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/auth/refresh",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/auth/refresh",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://auth-service:8081"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/auth/profile",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/auth/profile",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://auth-service:8081"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/categories",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/categories",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/categories",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/categories",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/products",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "extra_config": {
+        "qos/ratelimit/router": {
+          "max_rate": 100,
+          "client_max_rate": 50,
+          "strategy": "ip"
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/products",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/products",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/products",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/products/{id}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/products/{id}",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/products/{id}/uom",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/products/{id}/uom",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/bulk/matrices",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/bulk/matrices",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/bulk/calculate",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/bulk/calculate",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/catalog/bulk/verify-weighbridge",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/catalog/bulk/verify-weighbridge",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://catalog-service:8082"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/warehouses",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/warehouses",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/warehouses",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/warehouses",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/warehouses/{id}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/warehouses/{id}",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/stock",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/stock",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/stock/shrinkage",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/stock/shrinkage",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/stock/{warehouseId}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/stock/{warehouseId}",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/stock/{warehouseId}/{productId}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/stock/{warehouseId}/{productId}",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/reservations",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/reservations",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/reservations/{id}/commit",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/reservations/{id}/commit",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/reservations/{id}/release",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/reservations/{id}/release",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/inventory/movements",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/inventory/movements",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://inventory-service:8083"]
+        }
+      ]
+    }
+  ]
+}

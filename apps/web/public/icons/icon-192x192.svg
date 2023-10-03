@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <rect x="6" y="6" width="180" height="180" rx="34" fill="none" stroke="url(#amberGlow)" stroke-width="2" stroke-opacity="0.3"/>
+  
+  <!-- Industrial Construction Grid Graphic -->
+  <g transform="translate(36, 36)">
+    <!-- Isometric Grid Cube / Block -->
+    <path d="M60 10 L110 38 L60 66 L10 38 Z" fill="url(#amberGlow)" fill-opacity="0.9"/>
+    <path d="M10 38 L60 66 L60 115 L10 87 Z" fill="#b45309"/>
+    <path d="M60 66 L110 38 L110 87 L60 115 Z" fill="#d97706"/>
+    
+    <!-- Heavy Logistics Crane Accent Lines -->
+    <path d="M25 25 L95 25" stroke="#fef08a" stroke-width="4" stroke-linecap="round"/>
+    <path d="M45 10 L45 40" stroke="#fef08a" stroke-width="3" stroke-linecap="round"/>
+    <path d="M75 10 L75 40" stroke="#fef08a" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Central Grid Mark -->
+    <circle cx="60" cy="66" r="6" fill="#ffffff"/>
+  </g>
+</svg>

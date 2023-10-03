@@ -17,6 +17,10 @@ profile.out
 
 # Dependency directories
 vendor/
+node_modules/
+
+# Next.js build
+.next/
 
 # Environment and local configs
 .env

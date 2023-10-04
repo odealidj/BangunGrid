@@ -10,16 +10,16 @@
 Arsitektur sistem dirancang dengan pendekatan **Cloud-Native Microservices**, mengadopsi **Hexagonal Architecture (Ports and Adapters)** pada setiap service Go, **KrakenD API Gateway** sebagai gerbang tunggal (*Single Entry Point* dengan jalur migrasi terencana ke **Kong**), serta **NATS & NATS JetStream** untuk orkestrasi asinkron berbasis peristiwa (*Event-Driven Architecture*).
 
 ```mermaid
-graph TB
+flowchart TB
     subgraph ClientTier ["📱 Lapisan Klien / Client Presentation Tier"]
         ReactPWA["🌐 React PWA (Next.js SSR + CSR)<br>• Katalog Publik SEO-Friendly<br>• Portal B2B Tender & RFQ Kontraktor<br>• Backoffice Admin & Finance"]
         FlutterCust["📱 Flutter Mobile (Customer & Contractor)<br>• Katalog Ritel & Checkout B2C<br>• Kalkulator Material & BoQ Proyek<br>• Live Tracking Armada Kirim"]
         FlutterDriver["🚛 Flutter Mobile (Driver & Logistik)<br>• Surat Jalan Digital (e-DO)<br>• Offline-First e-POD (Foto + Tanda Tangan)"]
-        FlutterPOS["📟 Flutter Tablet (POS Toko Cabang)<br>• Kasir Kasir Cepat & Offline-Capable<br>• Integrasi Printer Bluetooth Thermal"]
+        FlutterPOS["📟 Flutter Tablet (POS Toko Cabang)<br>• Kasir Cepat & Offline-Capable<br>• Integrasi Printer Bluetooth Thermal"]
     end
 
     subgraph GatewayTier ["🚪 API Gateway Tier (Single Entry Point)"]
-        KrakenD["⚡ KrakenD API Gateway (Go-Native, Stateless)<br>• Validasi JWT RSA-256 Terpusat<br>• Injeksi Header Standar (X-User-ID, X-Tenant-ID, X-Roles)<br>• Proteksi Anti-Scraping & Rate Limiting per IP/Tenant<br>• CORS & SSL Termination Terpadu<br>• [Jalur Migrasi Siap ke Kong Gateway di Fase Enterprise]"]
+        KrakenD["⚡ KrakenD API Gateway (Go-Native, Stateless)<br>• Validasi JWT RSA-256 Terpusat<br>• Injeksi Header Standar (X-User-ID, X-Tenant-ID, X-Roles)<br>• Proteksi Anti-Scraping & Rate Limiting per IP/Tenant<br>• CORS & SSL Termination Terpadu<br>• (Jalur Migrasi Siap ke Kong Gateway di Fase Enterprise)"]
     end
 
     subgraph MicroservicesTier ["⚙️ Go Microservices Tier (Hexagonal Architecture + Chi Router)"]
@@ -33,10 +33,10 @@ graph TB
     end
 
     subgraph DataEventTier ["💾 Lapisan Data, Caching & Event Streaming"]
-        Postgres[(🐘 PostgreSQL 16 + PostGIS Spasial<br>Database-per-Service Terisolasi:<br>• db_auth • db_catalog • db_inventory<br>• db_order • db_fleet (PostGIS) • db_billing)]
-        RedisCluster[(⚡ Redis 7 In-Memory<br>• Distributed Stock Locking (SetNX + Lua)<br>• Idempotency Keys Middleware<br>• Fast ATP Caching)]
-        NatsJetStream[(📨 NATS 2.10 & JetStream<br>• NATS Core: Pub/Sub & Telemetri Realtime<br>• JetStream: Saga Pattern & Log Peristiwa Persisten)]
-        MinIOS3[(🪣 MinIO S3 Object Storage<br>• Arsip Foto e-POD & Surat Jalan<br>• Dokumen Faktur Pajak & Berita Acara)]
+        Postgres[("🐘 PostgreSQL 16 + PostGIS Spasial<br>Database-per-Service Terisolasi:<br>• db_auth • db_catalog • db_inventory<br>• db_order • db_fleet (PostGIS) • db_billing")]
+        RedisCluster[("⚡ Redis 7 In-Memory<br>• Distributed Stock Locking (SetNX + Lua)<br>• Idempotency Keys Middleware<br>• Fast ATP Caching")]
+        NatsJetStream[("📨 NATS 2.10 & JetStream<br>• NATS Core: Pub/Sub & Telemetri Realtime<br>• JetStream: Saga Pattern & Log Peristiwa Persisten")]
+        MinIOS3[("🪣 MinIO S3 Object Storage<br>• Arsip Foto e-POD & Surat Jalan<br>• Dokumen Faktur Pajak & Berita Acara")]
     end
 
     %% Relasi Klien ke Gateway
@@ -87,7 +87,7 @@ graph TB
 Setiap microservice ditulis menggunakan bahasa **Go (Golang)** yang memisahkan aturan bisnis dari dependensi infrastruktur eksternal:
 
 ```mermaid
-graph TD
+flowchart TD
     subgraph DrivingAdapters ["🔌 Driving Adapters (Input)"]
         HTTPHandler["Chi v5 HTTP Handlers (/api/v1/*)"]
         NATSConsumer["NATS JetStream Event Consumers"]

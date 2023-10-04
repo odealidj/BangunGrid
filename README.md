@@ -127,17 +127,41 @@ flowchart TD
 
 ---
 
-## 📦 Status Implementasi Microservices
+## 📂 Struktur Direktori Monorepo (Project Directory Structure)
 
-| Service | Port Host | Port Kontainer | Status | Cakupan Fitur Utama |
+```
+BangunGrid/
+├── apps/
+│   └── web/                   # Frontend Web PWA (Next.js 13, React 18, TypeScript, Vanilla CSS)
+│       ├── public/            # PWA Manifest, Service Worker, App Icons
+│       └── src/               # UI Components, Layout, Theme & Styling
+├── krakend/                   # KrakenD API Gateway (Stateless Reverse Proxy & JWT Validator)
+│   ├── config/                # KrakenD JSON configuration
+│   └── templates/             # Endpoint definitions per microservice
+├── services/                  # Backend Microservices (Go Hexagonal Architecture)
+│   ├── auth-service/          # Identitas, Multi-Tenant, JWT RSA-256 & JWKS Public Keys
+│   ├── catalog-service/       # Piramida Multi-UoM, Densitas Curah, Toleransi Timbang
+│   └── inventory-service/     # Multi-Gudang/Silo, ATP, Distributed Lock, Shrinkage Ledger
+├── pkg/                       # Shared Go Libraries (Database, Redis, Logger, Errors, Middleware)
+├── docker-compose.yml         # Orkestrasi Kontainer Lokal (Microservices + Gateway + Backing)
+└── Makefile                   # Build, Test, Lint, dan Verifikasi Kode Otomatis
+```
+
+---
+
+## 📦 Status Implementasi Layanan & Komponen
+
+| Komponen / Service | Port Host | Port Kontainer | Status | Cakupan Fitur Utama |
 | :--- | :--- | :--- | :--- | :--- |
-| **`auth-service`** | `8085` | `8081` |  **Selesai** | Multi-Tenant, RSA-256 JWT & JWKS, User Roles (B2B, B2C, Driver, Kasir, Admin), Idempotency. |
-| **`catalog-service`** | `8086` | `8082` |  **Selesai** | Multi-UoM (Sak/Palet/Ton), Matriks Massa Jenis Curah ($m^3 \leftrightarrow \text{Kg}$), Verifikasi Toleransi Jembatan Timbang. |
-| **`inventory-service`** | `8087` | `8083` |  **Selesai** | Multi-Gudang/Stockyard/Silo, Available-to-Promise (ATP), Distributed Locking (Redis), Reservasi Stok, Susut Curah (*Shrinkage*). |
-| **`order-service`** | `8088` | `8084` |  *Berikutnya* | Checkout Omnichannel B2C, RFQ Kontraktor B2B, Partial Delivery Call-Off, Manajemen Termin. |
-| **`fleet-service`** | `8089` | `8085` |  *Terencana* | Kalkulasi Kubikasi vs Tonase Armada, Dispatching Surat Jalan, Tracking GPS & Offline e-POD. |
-| **`billing-service`** | `8090` | `8086` |  *Terencana* | Rekonsiliasi Otomatis, Limit Plafon Kredit B2B, e-Faktur Pajak PPN (11%), Aging AR Warning. |
-| **`notification-service`**| - | - |  *Terencana* | Dispatcher WhatsApp, Push Notification FCM, Email Faktur. |
+| **`krakend-gateway`** | `8088` | `8080` | 🟢 **Selesai** | API Gateway terpusat, JWT RSA-256 Validator (JWKS), Rate Limiting, Header Injection, CORS Terpadu. |
+| **`apps/web (PWA)`** | `3001` | - (Node.js) | 🟢 **Selesai** | Next.js 13 (App Router), Vanilla CSS Design System, Service Worker & Offline Manifest, Kalkulator Densitas & UoM, Dashboard Ekosistem. |
+| **`auth-service`** | `8085` | `8081` | 🟢 **Selesai** | Multi-Tenant, RSA-256 JWT & JWKS, User Roles (B2B, B2C, Driver, Kasir, Admin), Idempotency Middleware. |
+| **`catalog-service`** | `8086` | `8082` | 🟢 **Selesai** | Multi-UoM (Sak/Palet/Ton), Matriks Massa Jenis Curah ($m^3 \leftrightarrow \text{Kg}$), Verifikasi Toleransi Jembatan Timbang. |
+| **`inventory-service`** | `8087` | `8083` | 🟢 **Selesai** | Multi-Gudang/Stockyard/Silo, Available-to-Promise (ATP), Distributed Locking (Redis), Reservasi Stok, Susut Curah (*Shrinkage*). |
+| **`order-service`** | `8088` | `8084` | 🟡 *Berikutnya* | Checkout Omnichannel B2C, RFQ Kontraktor B2B, Partial Delivery Call-Off, Manajemen Termin. *(Catatan: port internal dialihkan via Gateway)*. |
+| **`fleet-service`** | `8089` | `8085` | ⚪ *Terencana* | Kalkulasi Kubikasi vs Tonase Armada, Dispatching Surat Jalan, Tracking GPS & Offline e-POD. |
+| **`billing-service`** | `8090` | `8086` | ⚪ *Terencana* | Rekonsiliasi Otomatis, Limit Plafon Kredit B2B, e-Faktur Pajak PPN (11%), Aging AR Warning. |
+| **`notification-service`**| - | - | ⚪ *Terencana* | Dispatcher WhatsApp, Push Notification FCM, Email Faktur. |
 
 ---
 
@@ -146,10 +170,11 @@ flowchart TD
 ### 1. Prasyarat Sistem
 * **Docker & Docker Compose** (v24+)
 * **Go (Golang)** 1.21+
+* **Node.js** (v18+) & **npm** (untuk Frontend Web PWA)
 * **GNU Make**
 
-### 2. Menjalankan Seluruh Ekosistem Kontainer
-Nyalakan backing services (PostgreSQL PostGIS, Redis, NATS, MinIO) beserta microservice:
+### 2. Menjalankan Backend & API Gateway (Docker)
+Nyalakan backing services (PostgreSQL PostGIS, Redis, NATS, MinIO) beserta microservice dan KrakenD API Gateway:
 
 ```bash
 # Menyalakan seluruh ekosistem (Background daemon)
@@ -159,10 +184,31 @@ make docker-up
 docker compose ps
 ```
 
-### 3. Pengecekan Kualitas Kode & Pengujian Otomatis
+### 3. Menjalankan Frontend Web PWA (Lokal)
+Masuk ke direktori `apps/web` dan jalankan server pengembangan Next.js:
 
 ```bash
-# Menjalankan seluruh Unit Test dengan Data Race Detector (-race):
+cd apps/web
+npm install
+npm run dev
+```
+
+Aplikasi PWA akan dapat diakses di browser pada: `http://localhost:3001`
+
+### 4. Daftar Endpoint & Alamat Layanan
+* **Frontend Web PWA**: `http://localhost:3001`
+* **KrakenD API Gateway**: `http://localhost:8088`
+  * Health Check: `http://localhost:8088/__health`
+  * Auth Profile (via Gateway): `http://localhost:8088/api/v1/auth/profile`
+* **Backend Microservices (Direct Port internal debug)**:
+  * `auth-service`: `http://localhost:8085`
+  * `catalog-service`: `http://localhost:8086`
+  * `inventory-service`: `http://localhost:8087`
+
+### 5. Pengecekan Kualitas Kode & Pengujian Otomatis
+
+```bash
+# Menjalankan seluruh Go Unit Test dengan Data Race Detector (-race):
 make test-race
 
 # Menjalankan Automated End-to-End Integration Tests:
@@ -170,6 +216,9 @@ make test-integration
 
 # Verifikasi menyeluruh (Linting, Security Scanner, Dependency Vulnerability, Tests):
 make verify-all
+
+# Build verifikasi Frontend Web PWA:
+cd apps/web && npm run build
 ```
 
 ---

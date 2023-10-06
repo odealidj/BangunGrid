@@ -427,6 +427,373 @@
           "host": ["http://inventory-service:8083"]
         }
       ]
+    },
+    {
+      "endpoint": "/api/v1/orders/estimate",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/estimate",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/{id}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/{id}",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/number/{orderNo}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/number/{orderNo}",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/{id}/status",
+      "method": "PATCH",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/{id}/status",
+          "encoding": "no-op",
+          "method": "PATCH",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/{id}/cancel",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/{id}/cancel",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/rfq",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/rfq",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/rfq",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_query_strings": ["*"],
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/rfq",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/rfq/{id}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/rfq/{id}",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/rfq/{id}",
+      "method": "PATCH",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/rfq/{id}",
+          "encoding": "no-op",
+          "method": "PATCH",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/{id}/call-offs",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/{id}/call-offs",
+          "encoding": "no-op",
+          "method": "POST",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/{id}/call-offs",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/{id}/call-offs",
+          "encoding": "no-op",
+          "method": "GET",
+          "host": ["http://order-service:8084"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/orders/call-offs/{deliveryId}/status",
+      "method": "PATCH",
+      "output_encoding": "no-op",
+      "input_headers": ["*"],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://auth-service:8081/.well-known/jwks.json",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["role", "x-user-role"],
+            ["tenant_id", "x-tenant-id"]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/api/v1/orders/call-offs/{deliveryId}/status",
+          "encoding": "no-op",
+          "method": "PATCH",
+          "host": ["http://order-service:8084"]
+        }
+      ]
     }
   ]
 }

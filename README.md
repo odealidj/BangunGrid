@@ -141,7 +141,8 @@ BangunGrid/
 ├── services/                  # Backend Microservices (Go Hexagonal Architecture)
 │   ├── auth-service/          # Identitas, Multi-Tenant, JWT RSA-256 & JWKS Public Keys
 │   ├── catalog-service/       # Piramida Multi-UoM, Densitas Curah, Toleransi Timbang
-│   └── inventory-service/     # Multi-Gudang/Silo, ATP, Distributed Lock, Shrinkage Ledger
+│   ├── inventory-service/     # Multi-Gudang/Silo, ATP, Distributed Lock, Shrinkage Ledger
+│   └── order-service/         # Checkout B2C, Logistik Berat (Kuli/Langsir), B2B RFQ, Call-Off Deliveries
 ├── pkg/                       # Shared Go Libraries (Database, Redis, Logger, Errors, Middleware)
 ├── docker-compose.yml         # Orkestrasi Kontainer Lokal (Microservices + Gateway + Backing)
 └── Makefile                   # Build, Test, Lint, dan Verifikasi Kode Otomatis
@@ -158,8 +159,8 @@ BangunGrid/
 | **`auth-service`** | `8085` | `8081` | 🟢 **Selesai** | Multi-Tenant, RSA-256 JWT & JWKS, User Roles (B2B, B2C, Driver, Kasir, Admin), Idempotency Middleware. |
 | **`catalog-service`** | `8086` | `8082` | 🟢 **Selesai** | Multi-UoM (Sak/Palet/Ton), Matriks Massa Jenis Curah ($m^3 \leftrightarrow \text{Kg}$), Verifikasi Toleransi Jembatan Timbang. |
 | **`inventory-service`** | `8087` | `8083` | 🟢 **Selesai** | Multi-Gudang/Stockyard/Silo, Available-to-Promise (ATP), Distributed Locking (Redis), Reservasi Stok, Susut Curah (*Shrinkage*). |
-| **`order-service`** | `8088` | `8084` | 🟡 *Berikutnya* | Checkout Omnichannel B2C, RFQ Kontraktor B2B, Partial Delivery Call-Off, Manajemen Termin. *(Catatan: port internal dialihkan via Gateway)*. |
-| **`fleet-service`** | `8089` | `8085` | ⚪ *Terencana* | Kalkulasi Kubikasi vs Tonase Armada, Dispatching Surat Jalan, Tracking GPS & Offline e-POD. |
+| **`order-service`** | `8084` | `8084` | 🟢 **Selesai** | Checkout Omnichannel B2C, Kalkulator Estimasi Muatan Armada, Biaya Kuli & Langsir, B2B RFQ Tender, Pengiriman Parsial (Call-Off), Asinkron Saga NATS. |
+| **`fleet-service`** | `8089` | `8085` | 🟡 *Berikutnya* | Kalkulasi Kubikasi vs Tonase Armada, Dispatching Surat Jalan, Tracking GPS & Offline e-POD. |
 | **`billing-service`** | `8090` | `8086` | ⚪ *Terencana* | Rekonsiliasi Otomatis, Limit Plafon Kredit B2B, e-Faktur Pajak PPN (11%), Aging AR Warning. |
 | **`notification-service`**| - | - | ⚪ *Terencana* | Dispatcher WhatsApp, Push Notification FCM, Email Faktur. |
 
@@ -204,6 +205,7 @@ Aplikasi PWA akan dapat diakses di browser pada: `http://localhost:3001`
   * `auth-service`: `http://localhost:8085`
   * `catalog-service`: `http://localhost:8086`
   * `inventory-service`: `http://localhost:8087`
+  * `order-service`: `http://localhost:8084`
 
 ### 5. Pengecekan Kualitas Kode & Pengujian Otomatis
 
